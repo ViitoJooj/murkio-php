@@ -1,0 +1,27 @@
+{
+    "name": "murkio/identity",
+    "description": "Murkio identity for PHP backends: verifies the session of each request and writes the login components into server-rendered pages.",
+    "type": "library",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.1",
+        "ext-json": "*",
+        "ext-sodium": "*"
+    },
+    "require-dev": {
+        "nyholm/psr7": "^1.8",
+        "psr/http-server-middleware": "^1.0"
+    },
+    "suggest": {
+        "ext-apcu": "Shares the cached application keys between requests without touching the disk",
+        "psr/http-server-middleware": "For Murkio\\Psr15Middleware (Slim, Mezzio, Laminas...)"
+    },
+    "autoload": {
+        "psr-4": {
+            "Murkio\\": "src/"
+        }
+    },
+    "scripts": {
+        "test": "php tests/run.php"
+    }
+}

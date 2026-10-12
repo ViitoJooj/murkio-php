@@ -14,6 +14,5 @@ final class AuthResult
         public ?string $reason = null,
         /** The browser holds a session, even if this request's token is missing or expired. */
         public bool $signedInHint = false,
-    ) {
-    }
+    ) {}
 }

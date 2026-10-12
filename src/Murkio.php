@@ -78,7 +78,7 @@ final class Murkio
             if (function_exists('curl_init')) {
                 $handle = curl_init($url);
                 curl_setopt_array($handle, [
-                    CURLOPT_CUSTOMREQUEST => $method,
+                    CURLOPT_CUSTOMREQUEST => $method !== '' ? $method : 'GET',
                     CURLOPT_HTTPHEADER => $lines,
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_TIMEOUT_MS => (int) ($timeout * 1000),
@@ -233,7 +233,7 @@ final class Murkio
         $key = $this->publicKey($bootstrap, (string) ($header['kid'] ?? ''));
         $signature = self::base64UrlDecode($parts[2]);
         try {
-            $valid = $signature !== null && strlen($signature) === SODIUM_CRYPTO_SIGN_BYTES
+            $valid = $signature !== null && strlen($signature) === SODIUM_CRYPTO_SIGN_BYTES && $key !== ''
                 && sodium_crypto_sign_verify_detached($signature, $parts[0] . '.' . $parts[1], $key);
         } catch (\SodiumException) {
             $valid = false;
@@ -505,7 +505,7 @@ final class Murkio
             'Content-Type' => 'text/html; charset=utf-8',
             'Cache-Control' => 'no-store',
             'Content-Security-Policy' => "default-src 'none'; script-src 'nonce-{$nonce}' {$scriptOrigin}; connect-src {$apiOrigin}; base-uri 'none'; frame-ancestors 'none'",
-            'Set-Cookie' => self::HANDSHAKE_GUARD . '=1; Path=/; Max-Age=30; SameSite=Lax' . ($scheme === 'https' ? '; Secure' : ''),
+            'Set-Cookie' => self::HANDSHAKE_GUARD . '=1; Path=/; Max-Age=30; HttpOnly; SameSite=Lax' . ($scheme === 'https' ? '; Secure' : ''),
         ], $page);
     }
 

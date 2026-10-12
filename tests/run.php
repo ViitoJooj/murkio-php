@@ -98,8 +98,8 @@ function check(string $name, bool $ok, string $detail = ''): void
 
 $hash = Murkio::fnv1a32(KEY);
 
-// --- shared vectors (libs/spec/server) ---------------------------------------
-$vectors = json_decode((string) file_get_contents(__DIR__ . '/../../../spec/server/vectors.json'), true);
+// --- shared vectors (spec/server) --------------------------------------------
+$vectors = json_decode((string) file_get_contents(__DIR__ . '/../spec/server/vectors.json'), true);
 foreach ($vectors['cookie_hash'] as $value => $expected) {
     check("fnv1a32({$value})", Murkio::fnv1a32((string) $value) === $expected);
 }
@@ -188,7 +188,7 @@ $headers = ['Authorization' => 'Bearer ' . $token];
 $client->authenticate(request('GET', $headers), ['loadUser' => true, 'checkRevocation' => true]);
 $result = $client->authenticate(request('GET', $headers), ['loadUser' => true, 'checkRevocation' => true]);
 check('user is loaded', $result->user?->email === 'ana@example.com');
-check('user and revocation are cached', count(array_keys($api->calls, 'POST /v1/me')) === 1 && count(array_keys($api->calls, 'POST /v1/sessions/verify')) === 1);
+check('user and revocation are cached', count(array_keys($api->calls, 'POST /v1/me', true)) === 1 && count(array_keys($api->calls, 'POST /v1/sessions/verify', true)) === 1);
 $revoked = $api->token(['jti' => 'revoked']);
 $api->revoked[$revoked] = true;
 $result = $client->authenticate(request('GET', ['Authorization' => 'Bearer ' . $revoked]), ['checkRevocation' => true]);
@@ -211,7 +211,7 @@ $hint = ["__Host-murkio_uat_{$hash}" => '1'];
 [, $response] = $client->protect(request('GET', $page, $hint), ['required' => true]);
 preg_match("{'nonce-([^']+)'}", $response->headers['Content-Security-Policy'] ?? '', $match);
 check('handshake page', $response->status === 200 && str_contains($response->body, 'nonce="' . ($match[1] ?? '?') . '"') && str_contains($response->body, 'data-murkio-key="' . KEY . '"'));
-check('handshake headers', str_contains($response->headers['Set-Cookie'], 'murkio_handshake=1') && $response->headers['Cache-Control'] === 'no-store' && str_contains($response->headers['Content-Security-Policy'], 'connect-src https://api.example.com;'));
+check('handshake headers', str_contains($response->headers['Set-Cookie'], 'murkio_handshake=1') && str_contains($response->headers['Set-Cookie'], 'HttpOnly') && $response->headers['Cache-Control'] === 'no-store' && str_contains($response->headers['Content-Security-Policy'], 'connect-src https://api.example.com;'));
 [, $response] = $client->protect(request('GET', $page, $hint + ['murkio_handshake' => '1']), ['required' => true]);
 check('the guard cookie stops the loop', $response?->status === 401);
 [, $response] = $client->protect(request('GET', $page, $hint), ['required' => true, 'handshake' => false]);
@@ -233,9 +233,7 @@ check('self-hosted script has no pinned integrity', !str_contains($api->client([
 if (interface_exists(\Psr\Http\Server\MiddlewareInterface::class) && class_exists(\Nyholm\Psr7\Factory\Psr17Factory::class)) {
     $factory = new \Nyholm\Psr7\Factory\Psr17Factory();
     $handler = new class ($factory) implements \Psr\Http\Server\RequestHandlerInterface {
-        public function __construct(private \Nyholm\Psr7\Factory\Psr17Factory $factory)
-        {
-        }
+        public function __construct(private \Nyholm\Psr7\Factory\Psr17Factory $factory) {}
 
         public function handle(\Psr\Http\Message\ServerRequestInterface $request): \Psr\Http\Message\ResponseInterface
         {

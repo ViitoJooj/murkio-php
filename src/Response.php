@@ -12,8 +12,7 @@ final class Response
         public readonly int $status,
         public readonly array $headers = [],
         public readonly string $body = '',
-    ) {
-    }
+    ) {}
 
     /** Sends the response with PHP's own functions (plain PHP, no framework). */
     public function send(): void

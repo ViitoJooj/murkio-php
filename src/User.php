@@ -16,6 +16,5 @@ final class User
         public readonly array $roles,
         public readonly bool $mfaEnabled,
         public readonly string $createdAt,
-    ) {
-    }
+    ) {}
 }

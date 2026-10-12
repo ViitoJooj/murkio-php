@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- Psalm runs here for its taint analysis: it follows what comes from the
+     request and fails when it reaches HTML, a header, a file or a shell
+     without being escaped. Types are PHPStan's job (phpstan.neon.dist). -->
+<psalm
+    errorLevel="4"
+    findUnusedBaselineEntry="false"
+    findUnusedCode="false"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+>
+    <projectFiles>
+        <directory name="src" />
+    </projectFiles>
+</psalm>

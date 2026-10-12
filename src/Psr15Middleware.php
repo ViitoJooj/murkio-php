@@ -28,8 +28,7 @@ final class Psr15Middleware implements MiddlewareInterface
         private readonly Murkio $murkio,
         private readonly ResponseFactoryInterface $responses,
         private readonly array $options = [],
-    ) {
-    }
+    ) {}
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {

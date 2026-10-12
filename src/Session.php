@@ -18,8 +18,7 @@ final class Session
         public readonly array $roles,
         public readonly array $claims,
         public readonly string $token,
-    ) {
-    }
+    ) {}
 
     public function hasRole(string ...$roles): bool
     {

@@ -1,0 +1,58 @@
+name: Build
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    name: Build (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ["8.1", "8.5"]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: sodium, curl
+          coverage: none
+          tools: composer:v2
+
+      - name: Validate composer.json
+        run: composer validate --strict
+
+      - name: Check the syntax of every file
+        run: |
+          find src tests -name "*.php" -print0 | xargs -0 -n 1 php -l
+
+      - name: Install without the development packages
+        run: composer install --no-dev --no-interaction --no-progress --classmap-authoritative
+
+      - name: Load every class through the autoloader
+        run: |
+          php -r '
+            require "vendor/autoload.php";
+            foreach (glob("src/*.php") as $file) {
+                $class = "Murkio\\" . basename($file, ".php");
+                if ($class === "Murkio\\Psr15Middleware") continue; // needs the PSR-15 interfaces, a development package
+                if (!class_exists($class) && !interface_exists($class)) { fwrite(STDERR, "cannot load $class\n"); exit(1); }
+            }
+            echo "every class loads\n";
+          '

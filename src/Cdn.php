@@ -11,5 +11,5 @@ final class Cdn
 {
     public const VERSION = '0.1.0';
     public const URL = 'https://cdn.jsdelivr.net/npm/@murkio/html@0.1.0/dist/murkio.js';
-    public const INTEGRITY = 'sha384-xj1fPXqqyxakYONrZDGRRwz/NSyJG+xTFUz0jpHCOfWGDxNWl8sDFUaL6D5GAD4B';
+    public const INTEGRITY = 'sha384-c1uw6fHl7lO2UKbhw6gSkHmvLuJTh9DD3fAzRYZnHSUwhMuN5I8H2BnyGrYlnoMa';
 }

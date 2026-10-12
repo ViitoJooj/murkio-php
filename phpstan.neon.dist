@@ -1,7 +1,8 @@
-# The strictest level: every value has a known type, including what comes
-# from JSON and from the request.
+# Level 8 of 10: every call, property and nullable value is checked. The two
+# levels above it reject any cast of a `mixed`, which is how the SDK reads
+# JSON it does not trust (every field is cast to the type it must have).
 parameters:
-    level: max
+    level: 8
     paths:
         - src
     treatPhpDocTypesAsCertain: false

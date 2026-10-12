@@ -83,11 +83,26 @@ backend never signs anyone in: the browser does.
 
 ## Developing
 
-This repository is a git submodule of the Murkio identity service
-(`libs/external/php`). The tests run from that checkout: they read the token vectors
-every Murkio server SDK shares (`libs/spec/server`).
-
 ```sh
 composer install
 php tests/run.php
 ```
+
+The tests read the token vectors every Murkio server SDK shares. That copy (`spec/`) and
+the checks in `infra/pipeline/` are kept in the Murkio identity service and synced from
+there, so they are not edited here.
+
+Every pull request runs the workflows in `.github/workflows`. The same checks, locally
+(the tools are the PHARs of their releases):
+
+| Workflow | What it runs |
+| --- | --- |
+| Build | `composer validate --strict`, `php -l` on every file, an install without development packages that loads every class; on PHP 8.1 and 8.5 |
+| Format | `php-cs-fixer fix --dry-run --diff` |
+| Lint | `phpstan analyse` (level 8) |
+| Tests | `php tests/run.php` on PHP 8.1 and 8.5 |
+| Quality & Governance Checks | `for check in infra/pipeline/*.py; do python3 "$check"; done` |
+| Security | `psalm --config=psalm.xml.dist --taint-analysis`, `composer audit`, `gitleaks git .`, `zizmor --pedantic .` |
+| Dependency Review | run by GitHub on the pull request |
+
+Security reports: see [SECURITY.md](SECURITY.md).

@@ -1,0 +1,7 @@
+# The strictest level: every value has a known type, including what comes
+# from JSON and from the request.
+parameters:
+    level: max
+    paths:
+        - src
+    treatPhpDocTypesAsCertain: false

@@ -1,0 +1,6 @@
+# The runtime dependencies this SDK ships with, one per line, each with the
+# reason it is needed. infra/pipeline/verify_dependencies.py fails when the
+# manifest and this list disagree.
+
+ext-json   # reads the answers of the API and the claims of the token
+ext-sodium # verifies the Ed25519 signature of the access token
